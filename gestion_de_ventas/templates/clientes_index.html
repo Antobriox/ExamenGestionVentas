@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<section>
+    <h2>Listado de Vendedores</h2>
+    <a href="{{ url_for('clientes_form') }}">Agregar Vendedor</a>
+    <ul>
+        {% for vendedor in vendedores %}
+        <li>{{ vendedor.nombre }} - Región: {{ vendedor.region }}
+            <a href="{{ url_for('clientes_edit', id=vendedor.id) }}">Editar</a>
+            <a href="{{ url_for('clientes_delete', id=vendedor.id) }}">Eliminar</a>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

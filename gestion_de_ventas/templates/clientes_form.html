@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<section>
+    <h2>{% if vendedor %}Editar Vendedor{% else %}Agregar Vendedor{% endif %}</h2>
+    <form method="POST" action="{% if vendedor %}{{ url_for('clientes_update', id=vendedor.id) }}{% else %}{{ url_for('clientes_create') }}{% endif %}">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" value="{% if vendedor %}{{ vendedor.nombre }}{% endif %}" required>
+        <label for="region">Región:</label>
+        <input type="text" id="region" name="region" value="{% if vendedor %}{{ vendedor.region }}{% endif %}" required>
+        <button type="submit">{% if vendedor %}Actualizar{% else %}Agregar{% endif %}</button>
+    </form>
+</section>
+{% endblock %}

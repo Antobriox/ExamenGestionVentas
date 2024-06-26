@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<section>
+    <h2>Listado de Ventas</h2>
+    <a href="{{ url_for('ventas_form') }}">Agregar Venta</a>
+    <ul>
+        {% for venta in ventas %}
+        <li>Venta ID: {{ venta.id }} - Producto: {{ venta.producto.nombre }} - Vendedor: {{ venta.vendedor.nombre }} - Cantidad: {{ venta.cantidad }} - Fecha: {{ venta.fecha_venta }}
+            <a href="{{ url_for('ventas_edit', id=venta.id) }}">Editar</a>
+            <a href="{{ url_for('ventas_delete', id=venta.id) }}">Eliminar</a>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<section>
+    <h2>Listado de Productos</h2>
+    <a href="{{ url_for('productos_form') }}">Agregar Producto</a>
+    <ul>
+        {% for producto in productos %}
+        <li>{{ producto.nombre }} - Precio: {{ producto.precio }} - Stock: {{ producto.stock }}
+            <a href="{{ url_for('productos_edit', id=producto.id) }}">Editar</a>
+            <a href="{{ url_for('productos_delete', id=producto.id) }}">Eliminar</a>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

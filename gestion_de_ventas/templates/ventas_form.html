@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<section>
+    <h2>{% if venta %}Editar Venta{% else %}Agregar Venta{% endif %}</h2>
+    <form method="POST" action="{% if venta %}{{ url_for('ventas_update', id=venta.id) }}{% else %}{{ url_for('ventas_create') }}{% endif %}">
+        <label for="producto">Producto:</label>
+        <select id="producto" name="producto_id" required>
+            {% for producto in productos %}
+            <option value="{{ producto.id }}" {% if venta and venta.producto_id == producto.id %}selected{% endif %}>{{ producto.nombre }}</option>
+            {% endfor %}
+        </select>
+        <label for="vendedor">Vendedor:</label>
+        <select id="vendedor" name="vendedor_id" required>
+            {% for vendedor in vendedores %}
+            <option value="{{ vendedor.id }}" {% if venta and venta.vendedor_id == vendedor.id %}selected{% endif %}>{{ vendedor.nombre }}</option>
+            {% endfor %}
+        </select>
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" name="cantidad" value="{% if venta %}{{ venta.cantidad }}{% endif %}" required>
+        <label for="fecha">Fecha de Venta:</label>
+        <input type="date" id="fecha" name="fecha_venta" value="{% if venta %}{{ venta.fecha_venta }}{% endif %}" required>
+        <button type="submit">{% if venta %}Actualizar{% else %}Agregar{% endif %}</button>
+    </form>
+</section>
+{% endblock %}

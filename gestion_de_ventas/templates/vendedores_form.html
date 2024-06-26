@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <h2>{% if vendedor %}Editar Vendedor{% else %}Agregar Nuevo Vendedor{% endif %}</h2>
+  <form method="POST" action="{% if vendedor %}{{ url_for('vendedores_update', id=vendedor.id) }}{% else %}{{ url_for('vendedores_create') }}{% endif %}">
+    <!-- Aquí van los campos del formulario -->
+    <button type="submit">{% if vendedor %}Actualizar{% else %}Agregar{% endif %}</button>
+  </form>
+{% endblock %}
