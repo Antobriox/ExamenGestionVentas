@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Tareas</title>
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        textarea,
+        input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 10px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .nav button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .nav button:hover {
+            background-color: #0056b3;
+        }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <button onclick="showView('crear-usuario')">Crear Usuario</button>
+            <button onclick="showView('crear-proyecto')">Crear Proyecto</button>
+            <button onclick="showView('crear-tarea')">Crear Tarea</button>
+            <button onclick="showView('ver-todo'); obtenerTodo()">Ver Todo</button>
+        </div>
+
+        <div id="crear-usuario" class="view">
+            <h2>Crear Usuario</h2>
+            <form id="crear-usuario-form">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required>
+                <label for="email">Correo electronico:</label>
+                <input type="email" id="email" name="email" required>
+                <button type="submit">Crear Usuario</button>
+            </form>
+        </div>
+
+        <div id="crear-proyecto" class="view">
+            <h2>Crear Proyecto</h2>
+            <form id="crear-proyecto-form">
+                <label for="nombre-proyecto">Nombre del Proyecto:</label>
+                <input type="text" id="nombre-proyecto" name="nombre-proyecto" required>
+                <label for="descripcion-proyecto">Descripcion:</label>
+                <textarea id="descripcion-proyecto" name="descripcion-proyecto" required></textarea>
+                <button type="submit">Crear Proyecto</button>
+            </form>
+        </div>
+
+        <div id="crear-tarea" class="view">
+            <h2>Crear Tarea</h2>
+            <form id="crear-tarea-form">
+                <label for="titulo-tarea">Titulo de la Tarea:</label>
+                <input type="text" id="titulo-tarea" name="titulo-tarea" required>
+                <label for="descripcion-tarea">Descripcion:</label>
+                <textarea id="descripcion-tarea" name="descripcion-tarea" required></textarea>
+                <label for="fecha-limite">Fecha Limite:</label>
+                <input type="date" id="fecha-limite" name="fecha-limite" required>
+                <label for="id-proyecto">ID del Proyecto:</label>
+                <input type="number" id="id-proyecto" name="id-proyecto" required>
+                <label for="id-usuario">ID del Usuario:</label>
+                <input type="number" id="id-usuario" name="id-usuario" required>
+                <button type="submit">Crear Tarea</button>
+            </form>
+        </div>
+
+        <div id="ver-todo" class="view">
+            <h2>Usuarios</h2>
+            <ul id="usuarios-list"></ul>
+
+            <h2>Proyectos</h2>
+            <ul id="proyectos-list"></ul>
+
+            <h2>Tareas</h2>
+            <ul id="tareas-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript para enviar datos al backend y actualizar la página
+        const crearUsuarioForm = document.getElementById('crear-usuario-form');
+        const crearProyectoForm = document.getElementById('crear-proyecto-form');
+        const crearTareaForm = document.getElementById('crear-tarea-form');
+        const usuariosList = document.getElementById('usuarios-list');
+        const proyectosList = document.getElementById('proyectos-list');
+        const tareasList = document.getElementById('tareas-list');
+
+        function showView(viewId) {
+            const views = document.querySelectorAll('.view');
+            views.forEach(view => view.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function enviarDatos(url, data, callback) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    callback(JSON.parse(xhr.responseText));
+                }
+            };
+            xhr.send(JSON.stringify(data));
+        }
+
+        crearUsuarioForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            enviarDatos('/usuarios', { nombre, email }, function(response) {
+                alert(response.mensaje);
+                obtenerUsuarios();
+            });
+        });
+
+        crearProyectoForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('nombre-proyecto').value;
+            const descripcion = document.getElementById('descripcion-proyecto').value;
+            enviarDatos('/proyectos', { nombre, descripcion }, function(response) {
+                alert(response.mensaje);
+                obtenerProyectos();
+            });
+        });
+
+        crearTareaForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const titulo = document.getElementById('titulo-tarea').value;
+            const descripcion = document.getElementById('descripcion-tarea').value;
+            const fechaLimite = document.getElementById('fecha-limite').value;
+            const idProyecto = parseInt(document.getElementById('id-proyecto').value);
+            const idUsuario = parseInt(document.getElementById('id-usuario').value);
+            enviarDatos('/tareas', { titulo, descripcion, fecha_limite: fechaLimite, id_proyecto: idProyecto, id_usuario: idUsuario }, function(response) {
+                alert(response.mensaje);
+                obtenerTareas();
+            });
+        });
+
+        function obtenerUsuarios() {
+            fetch('/usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    usuariosList.innerHTML = '';
+                    data.forEach(usuario => {
+                        const li = document.createElement('li');
+                        li.textContent = `ID: ${usuario[0]}, Nombre: ${usuario[1]}, Correo electronico: ${usuario[2]}`;
+                        usuariosList.appendChild(li);
+                    });
+                });
+        }
+
+        function obtenerProyectos() {
+            fetch('/proyectos')
+                .then(response => response.json())
+                .then(data => {
+                    proyectosList.innerHTML = '';
+                    data.forEach(proyecto => {
+                        const li = document.createElement('li');
+                        li.textContent = `ID: ${proyecto[0]}, Nombre: ${proyecto[1]}, Descripcion: ${proyecto[2]}`;
+                        proyectosList.appendChild(li);
+                    });
+                });
+        }
+
+        function obtenerTareas() {
+            fetch('/tareas')
+                .then(response => response.json())
+                .then(data => {
+                    tareasList.innerHTML = '';
+                    data.forEach(tarea => {
+                        const li = document.createElement('li');
+                        li.textContent = `ID: ${tarea[0]}, Titulo: ${tarea[1]}, Descripcion: ${tarea[2]}, Fecha Limite: ${tarea[3]}, ID Proyecto: ${tarea[4]}, ID Usuario: ${tarea[5]}`;
+                        tareasList.appendChild(li);
+                    });
+                });
+        }
+
+        function obtenerTodo() {
+            obtenerUsuarios();
+            obtenerProyectos();
+            obtenerTareas();
+        }
+
+        showView('crear-usuario');  // Muestra la vista de Crear Usuario por defecto
+    </script>
+</body>
+</html>
